@@ -1,0 +1,88 @@
+---
+title: "cancer viz"
+author: "Connor Flynn"
+date: "7/21/2024"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(plotly)
+library(viridis)
+library(ggstream)
+library(writexl)
+```
+
+```{r}
+nc_cancer_data <- read_csv(here("data/cas_cancer_nc.csv"))
+```
+
+```{r}
+# Adding the broader category column
+nc_cancer_data <- nc_cancer_data %>%
+  mutate(category = case_when(
+    `ICD-10` %in% c("C00", "C01", "C02", "C03", "C04", "C05", "C06", "C07", "C08", "C09", "C10", "C11", "C12", "C13", "C14") ~ "Malignant neoplasms of lip, oral cavity and pharynx",
+    `ICD-10` %in% c("C15", "C16", "C17", "C18", "C19", "C20", "C21", "C22", "C23", "C24", "C25", "C26") ~ "Malignant neoplasms of digestive organs",
+    `ICD-10` %in% c("C30", "C31", "C32", "C33", "C34", "C37", "C38", "C39") ~ "Malignant neoplasms of respiratory and intrathoracic organs",
+    `ICD-10` %in% c("C40", "C41") ~ "Malignant neoplasms of bone and articular cartilage",
+    `ICD-10` %in% c("C43", "C44") ~ "Melanoma and other malignant neoplasms of skin",
+    `ICD-10` %in% c("C45") ~ "Mesothelial and soft tissue neoplasms",
+    `ICD-10` %in% c("C46") ~ "Kaposi's sarcoma",
+    `ICD-10` %in% c("C47", "C48", "C49") ~ "Malignant neoplasms of mesothelial and soft tissue",
+    `ICD-10` %in% c("C50") ~ "Malignant neoplasms of breast",
+    `ICD-10` %in% c("C51", "C52", "C53", "C54", "C55", "C56", "C57", "C58") ~ "Malignant neoplasms of female genital organs",
+    `ICD-10` %in% c("C60", "C61", "C62", "C63") ~ "Malignant neoplasms of male genital organs",
+    `ICD-10` %in% c("C64", "C65", "C66", "C67", "C68") ~ "Malignant neoplasms of urinary tract",
+    `ICD-10` %in% c("C69", "C70", "C71", "C72") ~ "Malignant neoplasms of eye, brain, and other parts of the central nervous system",
+    `ICD-10` %in% c("C73", "C74", "C75") ~ "Malignant neoplasms of endocrine glands",
+    `ICD-10` %in% c("C76", "C77", "C78", "C79", "C80") ~ "Malignant neoplasms of ill-defined, secondary and unspecified sites",
+    `ICD-10` %in% c("C81", "C82", "C83", "C84", "C85", "C86", "C88") ~ "Malignant neoplasms of lymphoid, hematopoietic and related tissue",
+    `ICD-10` %in% c("C90", "C91", "C92", "C93", "C94", "C95", "C96") ~ "Malignant neoplasms of lymphoid, hematopoietic and related tissue",
+    TRUE ~ "Other"
+  ))
+```
+
+```{r}
+nc_cancer_data$counter_column = 1
+```
+
+```{r}
+#write_csv(nc_cancer_data, here("data/nc_cancer_data_categories.csv"))
+```
+
+```{r}
+#write_xlsx(nc_cancer_data, here("data/nc_cancer_data_categories.xlsx"))
+```
+
+
+```{r}
+nc_cancer_data_grouped_category <- nc_cancer_data %>% 
+  group_by(sex, diagnosis_year, category) %>% 
+  count()
+```
+
+```{r}
+# Ensure age_class is a factor with levels in the desired order
+# nc_cancer_data_grouped_category <- nc_cancer_data_grouped_category %>%
+#   mutate(age_class = factor(age_class, levels = c("moins de 20 ans", "20-29 ans", "30-39 ans", "40-49 ans", "50-59 ans", "60-69 ans", "70-79 ans", "80 ans et +")))
+```
+
+```{r}
+# Create the plot
+
+ggplot(data = nc_cancer_data_grouped_category, aes(x = diagnosis_year, 
+                                                  y = n,
+                                                  fill = category)) +
+  geom_area(color = "white") +
+  facet_wrap(~sex, nrow=2) +
+  theme_bw() +
+  scale_fill_viridis_d() +
+  labs(x = "Year", y = "Count", fill = "Category")
+```
+
+
+
+

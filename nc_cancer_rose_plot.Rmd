@@ -1,0 +1,317 @@
+---
+title: "Cancer New Caledonia"
+author: "Connor Flynn"
+date: "7/19/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(plotly)
+library(viridis)
+```
+
+```{r}
+nc_cancer_data <- read_csv(here("data/cas_cancer_nc.csv"))
+```
+
+
+```{r}
+nc_cancer_data_grouped <- nc_cancer_data %>% 
+  group_by(age_class, long_label_disease) %>% 
+  count()
+
+```
+
+
+```{r}
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n, # radius 
+    theta = ~age_class, # angle
+    type = "barpolar", 
+    color = ~long_label_disease,
+    hovertemplate = paste('n: %{r}',
+                          '<br>age_class: %{theta}<br>')) %>%  
+  layout(
+    showlegend = FALSE, # remove legend
+    polar = list(angularaxis = list(
+      rotation = 90,
+      direction = 'clockwise', # position the polar diagram
+      period = 8))
+  )
+fig
+
+```
+```{r}
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar", 
+    color = ~long_label_disease,
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>')) %>%
+  layout(
+    showlegend = FALSE,
+    polar = list(
+      bgcolor = "#1f1f1f",
+      angularaxis = list(
+        rotation = 90,
+        direction = 'clockwise',
+        period = 8,
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"),
+      radialaxis = list(
+        tickcolor = "#ffffff",
+        gridcolor = "#444444")),
+    paper_bgcolor = "#1f1f1f",
+    plot_bgcolor = "#1f1f1f",
+    font = list(color = "#ffffff")
+  )
+fig
+
+
+```
+
+```{r}
+# Reorder the age_class factor levels
+nc_cancer_data_grouped$age_class <- factor(nc_cancer_data_grouped$age_class,
+                                           levels = c("moins de 20 ans", "20-29 ans", "30-39 ans", "40-49 ans", 
+                                                      "50-59 ans", "60-69 ans", "70-79 ans", "80 ans et +"))
+
+```
+
+
+```{r}
+colors <- viridis(85, option = "B") # You can choose "A", "B", "C", "D", "E" for different color schemes
+
+```
+
+```{r}
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar", 
+    color = ~long_label_disease,
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>'),
+    colors = colors) %>%
+  layout(
+    showlegend = FALSE,
+    polar = list(
+      bgcolor = "#1f1f1f",
+      angularaxis = list(
+        rotation = 90,
+        direction = 'clockwise',
+        period = 8,
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"),
+      radialaxis = list(
+        tickcolor = "#ffffff",
+        gridcolor = "#444444")),
+    paper_bgcolor = "#1f1f1f",
+    plot_bgcolor = "#1f1f1f",
+    font = list(color = "#ffffff")
+  )
+fig
+
+```
+
+
+
+
+
+```{r}
+# Define disease levels and their corresponding categories
+disease_levels <- c(
+  "Autres leucémies à cellules précisées", "Leucémie lymphoïde", "Leucémie myéloïde", "Leucémie à cellules non précisées", "Leucémie monocytaire",
+  "Autres types précisés de lymphomes à cellules T/NK", "Lymphome de Hodgkin", "Lymphome folliculaire", "Lymphome non folliculaire",
+  "Lymphome non hodgkinien, de types autres et non précisés", "Lymphomes à cellules T/NK matures",
+  "Myélome multiple et tumeurs malignes à plasmocytes",
+  "Mélanome malin de la peau", "Autres tumeurs malignes de la peau",
+  "Tumeur maligne d'autres glandes endocrines et structures apparentées", "Tumeur maligne de la thyroïde", "Tumeur maligne de la surrénale",
+  "Tumeur maligne de l'encéphale", "Tumeur maligne de la moelle épinière, des nerfs crâniens et d'autres parties du système nerveux central",
+  "Tumeur maligne des nerfs périphériques et du système nerveux autonome", "Tumeur maligne des méninges",
+  "Tumeur maligne de l'estomac", "Tumeur maligne du côlon", "Tumeur maligne du rectum", "Tumeur maligne du foie et des voies biliaires intrahépatiques",
+  "Tumeur maligne du pancréas", "Tumeur maligne de l'intestin grêle", "Tumeur maligne de la jonction recto-sigmoïdienne",
+  "Tumeur maligne des organes digestifs, de sièges autres et mal définis", "Tumeur maligne de l'oesophage", "Tumeur maligne de l'hypopharynx",
+  "Tumeur maligne du rhinopharynx", "Tumeur maligne de l'oropharynx", "Tumeur maligne de la bouche, parties autres et non précisées",
+  "Tumeur maligne de la gencive", "Tumeur maligne du plancher de la bouche", "Tumeur maligne du palais", "Tumeur maligne de la langue, parties autres et non précisées",
+  "Tumeur maligne de la lèvre", "Tumeur maligne de l'anus et du canal anal", "Tumeur maligne des sinus de la face",
+  "Tumeur maligne du coeur, du médiastin et de la plèvre", "Tumeur maligne des fosses nasales et de l'oreille moyenne", "Tumeur maligne du sinus piriforme",
+  "Tumeur maligne de la trachée",
+  "Tumeur maligne de l'ovaire", "Tumeur maligne du col de l'utérus", "Tumeur maligne du corps de l'utérus", "Tumeur maligne de l'utérus, partie non précisée",
+  "Tumeur maligne du vagin", "Tumeur maligne de la vulve", "Tumeur maligne de la prostate", "Tumeur maligne du testicule",
+  "Tumeur maligne des organes génitaux de la femme, autres et non précisées", "Tumeur maligne des organes génitaux de l'homme, autres et non précisées",
+  "Tumeur maligne de la verge", "Tumeur maligne de la vésicule biliaire", "Tumeur maligne du rein, à l'exception du bassinet",
+  "Tumeur maligne du bassinet", "Tumeur maligne de l'uretère", "Tumeur maligne de la vessie", "Tumeur maligne des organes urinaires, autres et non précisées",
+  "Tumeurs malignes des voies biliaires, autres et non précisées", "Tumeur maligne du rétropéritoine et du péritoine",
+  "Tumeur maligne du sein",
+  "Tumeur maligne des os et du cartilage articulaire des membres", "Tumeur maligne des os et du cartilage articulaire, de sièges autres et non précisées",
+  "Tumeur maligne du tissu conjonctif et des autres tissus mous",
+  "Sarcome de Kaposi", "Mésothéliome", "Maladies immunoprolifératives malignes", "Tumeur maligne du thymus", "Tumeur maligne du placenta",
+  "Tumeurs malignes des tissus lymphoïde, hématopoïétique et apparentés, autres et non précisées",
+  "Tumeur maligne de siège non précisé", "Tumeur maligne de sièges autres et mal définis"
+)
+
+disease_categories <- c(
+  "Leukemias", "Leukemias", "Leukemias", "Leukemias", "Leukemias",
+  "Lymphomas", "Lymphomas", "Lymphomas", "Lymphomas",
+  "Lymphomas", "Lymphomas",
+  "Myelomas",
+  "Skin Cancers", "Skin Cancers",
+  "Endocrine Cancers", "Endocrine Cancers", "Endocrine Cancers",
+  "Brain and Nervous System Cancers", "Brain and Nervous System Cancers",
+  "Brain and Nervous System Cancers", "Brain and Nervous System Cancers",
+  "Digestive System Cancers", "Digestive System Cancers", "Digestive System Cancers",
+  "Digestive System Cancers", "Digestive System Cancers", "Digestive System Cancers",
+  "Digestive System Cancers", "Digestive System Cancers", "Digestive System Cancers",
+  "Digestive System Cancers", "Digestive System Cancers", "Digestive System Cancers",
+  "Digestive System Cancers", "Digestive System Cancers", "Digestive System Cancers",
+  "Digestive System Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers", "Genitourinary Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers", "Genitourinary Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers", "Genitourinary Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers", "Genitourinary Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers", "Genitourinary Cancers",
+  "Genitourinary Cancers", "Genitourinary Cancers",
+  "Breast Cancer",
+  "Bone and Soft Tissue Cancers", "Bone and Soft Tissue Cancers",
+  "Bone and Soft Tissue Cancers",
+  "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers",
+  "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers",
+  "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers", "Other Cancers",
+  "Other Cancers", "Other Cancers", "Other Cancers"
+)
+
+
+length(disease_levels)  # Should output 74
+length(disease_categories)  # Should also output 74
+```
+
+```{r}
+# Assign categories to the data
+nc_cancer_data_grouped$category <- factor(
+  nc_cancer_data_grouped$long_label_disease,
+  levels = disease_levels,
+  labels = disease_categories
+)
+```
+
+
+
+```{r}
+colors <- viridis(76, option = "B") # You can choose "A", "B", "C", "D", "E" for different color schemes
+
+```
+
+
+```{r}
+
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar", 
+    color = ~category,
+    colors = viridis::viridis(10),  # Adjust number of colors based on categories
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>'),
+    showlegend = FALSE  # To handle legend manually
+  ) %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar",
+    color = ~long_label_disease,
+    colors = viridis::viridis(length(unique(nc_cancer_data_grouped$long_label_disease))),
+    showlegend = FALSE,  # Enable legend for subcolors
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>', '<br>long_label_disease: %{color}<br>')
+  ) %>%
+  layout(
+    polar = list(
+      bgcolor = "#1f1f1f",
+      angularaxis = list(
+        rotation = 90,
+        direction = 'clockwise',
+        period = 8,
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"
+      ),
+      radialaxis = list(
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"
+      )
+    ),
+    paper_bgcolor = "#1f1f1f",
+    plot_bgcolor = "#1f1f1f",
+    font = list(color = "#ffffff")
+  )
+fig
+
+
+```
+
+```{r}
+
+
+# Main trace for categories
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar", 
+    color = ~category,
+    colors = viridis(11),  # Adjust number of colors based on the number of categories
+    name = ~category # Label for the main legend
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>'),
+    showlegend = TRUE
+  ) %>%
+  # Additional traces for subcategories by long_label_disease
+  add_trace(
+    data = nc_cancer_data_grouped,
+    r = ~n,
+    theta = ~age_class,
+    type = "barpolar",
+    color = ~long_label_disease,
+    colors = viridis(length(unique(nc_cancer_data_grouped$long_label_disease))),
+    name = 'Disease Level',  # Label for the subcolor legend
+    hovertemplate = paste('n: %{r}', '<br>age_class: %{theta}<br>', '<br>long_label_disease: %{color}<br>'),
+    showlegend = FALSE  # Turn off legend for subcategories
+  ) %>%
+  layout(
+    polar = list(
+      bgcolor = "#1f1f1f",
+      angularaxis = list(
+        rotation = 90,
+        direction = 'clockwise',
+        period = 8,
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"
+      ),
+      radialaxis = list(
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"
+      )
+    ),
+    paper_bgcolor = "#1f1f1f",
+    plot_bgcolor = "#1f1f1f",
+    font = list(color = "#ffffff"),
+    legend = list(
+      orientation = 'h',  # Horizontal legend
+      xanchor = 'center',
+      x = 0.5,
+      y = -0.1
+    )
+  )
+fig
+
+```
+
