@@ -14,7 +14,16 @@ library(plotly)
 library(viridis)
 library(ggstream)
 library(writexl)
+library(forcats)
+library(viridis)
 ```
+
+Cancer in New Caledonia
+- With 162 registered cases, the ASR for all cancers combined was 142.2 (range, 104.9 to 193.3) cases per million children per year and was not different from what was estimated in France (156.6
+- 1985 -> 1999 Thyroid cancer incidence in New Caledonia is the highest reported in the world and is approximately 10-fold higher than in most developed countries.
+- New Caledonia not isolated in Our World in Data
+
+
 
 ```{r}
 nc_cancer_data <- read_csv(here("data/cas_cancer_nc.csv"))
@@ -46,7 +55,7 @@ nc_cancer_data <- nc_cancer_data %>%
 ```
 
 ```{r}
-nc_cancer_data$counter_column = 1
+#nc_cancer_data$counter_column = 1
 ```
 
 ```{r}
@@ -64,11 +73,6 @@ nc_cancer_data_grouped_category <- nc_cancer_data %>%
   count()
 ```
 
-```{r}
-# Ensure age_class is a factor with levels in the desired order
-# nc_cancer_data_grouped_category <- nc_cancer_data_grouped_category %>%
-#   mutate(age_class = factor(age_class, levels = c("moins de 20 ans", "20-29 ans", "30-39 ans", "40-49 ans", "50-59 ans", "60-69 ans", "70-79 ans", "80 ans et +")))
-```
 
 ```{r}
 # Create the plot
@@ -83,6 +87,91 @@ ggplot(data = nc_cancer_data_grouped_category, aes(x = diagnosis_year,
   labs(x = "Year", y = "Count", fill = "Category")
 ```
 
+
+
+
+```{r}
+a <- ggplot(data = nc_cancer_data_grouped_category, aes(x = diagnosis_year, 
+                                                  y = n,
+                                                  color = category)) +
+  geom_line() +
+  facet_wrap(~sex, nrow=2) +
+  theme_bw() +
+  scale_color_viridis_d() +
+  labs(x = "Year", y = "Count", fill = "Category")
+
+ggplotly(a)
+```
+
+
+Petal Plot
+
+```{r}
+nc_cancer_data_petal <- nc_cancer_data %>% 
+  group_by(age_class, category) %>% 
+  count()
+```
+
+```{r}
+# Reorder the age_class factor levels
+nc_cancer_data_petal$age_class <- factor(
+  nc_cancer_data_petal$age_class,
+  levels = c("moins de 20 ans", "20-29 ans", "30-39 ans", "40-49 ans", "50-59 ans", "60-69 ans", "70-79 ans", "80 ans et +")
+)
+
+# Verify the factor levels
+print(levels(nc_cancer_data_petal$age_class))
+```
+
+
+
+```{r, fig.width=10, fig.height=8}
+# Define the Viridis color palette
+viridis_colors <- viridis_pal(option = "B")(length(unique(nc_cancer_data_petal$category)))
+
+# Create the plot
+fig <- plot_ly() %>%
+  add_trace(
+    data = nc_cancer_data_petal,
+    r = ~n, # radius 
+    theta = ~age_class, # angle
+    type = "barpolar", 
+    color = ~category,
+    colors = viridis_colors,
+    hovertemplate = paste('n: %{r}',
+                          '<br>age_class: %{theta}<br>')) %>%  
+  layout(
+    showlegend = TRUE, # keep legend
+    legend = list(
+      font = list(size = 10) # make the legend text smaller
+    ),
+     polar = list(
+      bgcolor = "#1f1f1f",
+      angularaxis = list(
+        rotation = 90,
+        direction = 'clockwise',
+        categoryorder = "array", # explicit ordering of categories
+        categoryarray = c("moins de 20 ans", "20-29 ans", "30-39 ans", "40-49 ans", "50-59 ans", "60-69 ans", "70-79 ans", "80 ans et +"),
+        period = 8,
+        tickcolor = "#ffffff",
+        gridcolor = "#444444"),
+      radialaxis = list(
+        tickcolor = "#ffffff",
+        gridcolor = "#444444")),
+    paper_bgcolor = "#1f1f1f",
+    plot_bgcolor = "#1f1f1f",
+    font = list(color = "#ffffff"),
+    title = list(
+      text = "Cancer Instances By Age Class, New Caledonia",
+      font = list(size = 16, color = 'white')
+    )
+  )
+
+fig
+
+```
+
+Animate?
 
 
 
