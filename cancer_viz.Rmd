@@ -16,6 +16,7 @@ library(ggstream)
 library(writexl)
 library(forcats)
 library(viridis)
+library(sunburstR)
 ```
 
 Cancer in New Caledonia
@@ -172,6 +173,43 @@ fig
 ```
 
 Animate?
+
+
+Suburst plot
+
+
+
+```{r}
+nc_cancer_data_sunburst <- nc_cancer_data %>% 
+  group_by(long_label_disease, category) %>% 
+  count(name = "total_cases")
+```
+
+```{r}
+nc_cancer_data_sunburst <- nc_cancer_data_sunburst %>%
+     mutate(category = str_replace(category, "Malignant neoplasms of ill-defined, secondary and unspecified sites", 
+                                  "Malignant neoplasms of illdefined, secondary and unspecified sites"))
+            
+nc_cancer_data_sunburst <- nc_cancer_data_sunburst %>%
+  mutate(long_label_disease = str_replace(long_label_disease, 
+                                 "Tumeur maligne de la jonction recto-sigmoïdienne", 
+                                 "Tumeur maligne de la jonction rectosigmoïdienne"))
+
+```
+
+
+```{r}
+nc_cancer_data_sunburst <- nc_cancer_data_sunburst %>% 
+  mutate(path = paste(category, long_label_disease, sep="-")) %>% 
+  ungroup() %>%
+  dplyr::select(path, total_cases)
+```
+
+
+```{r}
+p <- sunburst(nc_cancer_data_sunburst, legend=FALSE, count = TRUE)
+p
+```
 
 
 
