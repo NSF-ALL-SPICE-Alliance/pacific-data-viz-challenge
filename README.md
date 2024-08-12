@@ -7,11 +7,12 @@
 
 ## Overview
 
-Here at All-SPICE, we were very excited to hear about the [Pacific Data Viz Challenge](https://pacificdatavizchallenge.org/en)! In a few weeks, 3 students and 1 mentor submitted 3 entries to the challenge. The data and code for these entires will be added to this repository shortly...
+Here at All-SPICE, we were very excited to hear about the [Pacific Data Viz Challenge](https://pacificdatavizchallenge.org/en)! In a few weeks, 3 students and 1 mentor submitted 3 entries to the challenge. The data and code for these entries will be added to this repository shortly...
 
 #### Students
 
 [Victoria DelaCruz](https://github.com/vdlcruz670)
+To learn new skills and explore different data visualization tools, I decided to build an interactive dashboard using Tableau Desktop and Tableau Public. The dashboard utilizes data from the Pacific Data Hub specifically for education attainment and household heads by gender to analyze gender equality in the Pacific. The island countries of Kiribati, Marshall Islands, Palau, Tonga, Tuvalu, Nauru, and Vanuatu were explored given the availability of data. Data cleansing was performed using R and R Studio and data visualization and publication were done with Tableau. Check out the dashboard [here](https://public.tableau.com/app/profile/victoria.delacruz2422/viz/GenderInEqualityinthePacific_17223888097610/Overview)!
 
 [Upumoni Logologo](https://github.com/UpumoniLogologo)
 
